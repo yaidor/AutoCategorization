@@ -1,18 +1,54 @@
+from collections.abc import AsyncIterator
+from contextlib import asynccontextmanager
+
+import structlog
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 
-from app.core.config import settings
-
-app = FastAPI(
-    title="SalesCat API",
-    version="0.1.0",
-    description="Ingesta y categorización de reuniones de ventas.",
-)
+from app.api.health import router as health_router
+from app.core.config import VERSION, settings
+from app.core.logging import configure_logging
+from app.core.middleware import RequestIDMiddleware
 
 
-@app.get("/")
-async def root() -> dict[str, str]:
-    return {
-        "service": "salescat-api",
-        "status": "ok",
-        "environment": settings.environment,
-    }
+@asynccontextmanager
+async def lifespan(app: FastAPI) -> AsyncIterator[None]:
+    log = structlog.get_logger()
+    log.info("startup", environment=settings.environment, version=VERSION)
+    yield
+    log.info("shutdown")
+
+
+def create_app() -> FastAPI:
+    configure_logging(settings.log_level, settings.environment)
+
+    app = FastAPI(
+        title="SalesCat API",
+        version=VERSION,
+        description="Ingesta y categorización de reuniones de ventas.",
+        lifespan=lifespan,
+    )
+
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
+    app.add_middleware(RequestIDMiddleware)
+
+    app.include_router(health_router)
+
+    @app.get("/")
+    async def root() -> dict[str, str]:
+        return {
+            "service": "salescat-api",
+            "status": "ok",
+            "environment": settings.environment,
+        }
+
+    return app
+
+
+app = create_app()
