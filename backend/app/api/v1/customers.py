@@ -24,6 +24,7 @@ async def list_customers_endpoint(
     closed: bool | None = None,
     from_date: Annotated[date | None, Query(alias="from")] = None,
     to_date: Annotated[date | None, Query(alias="to")] = None,
+    uncategorized: bool | None = None,
 ) -> CustomerListPage:
     return await list_customers(
         session,
@@ -36,6 +37,7 @@ async def list_customers_endpoint(
         closed=closed,
         from_date=from_date,
         to_date=to_date,
+        uncategorized=uncategorized,
     )
 
 

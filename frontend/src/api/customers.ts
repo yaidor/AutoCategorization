@@ -25,6 +25,9 @@ function buildQuery(params: ListCustomersParams): string {
   if (params.seller_id !== undefined) qs.set("seller_id", String(params.seller_id));
   if (params.industry) qs.set("industry", params.industry);
   if (params.closed !== undefined) qs.set("closed", String(params.closed));
+  if (params.uncategorized !== undefined) {
+    qs.set("uncategorized", String(params.uncategorized));
+  }
   const s = qs.toString();
   return s ? `?${s}` : "";
 }

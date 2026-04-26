@@ -38,6 +38,7 @@ async def list_customers(
     closed: bool | None = None,
     from_date: date | None = None,
     to_date: date | None = None,
+    uncategorized: bool | None = None,
 ) -> CustomerListPage:
     provider = get_llm_provider()
     model_filter = provider.model
@@ -80,6 +81,10 @@ async def list_customers(
         base = base.where(Meeting.meeting_date >= from_date)
     if to_date is not None:
         base = base.where(Meeting.meeting_date <= to_date)
+    if uncategorized is True:
+        base = base.where(Categorization.id.is_(None))
+    elif uncategorized is False:
+        base = base.where(Categorization.id.is_not(None))
 
     count_stmt = select(func.count()).select_from(base.subquery())
     total = (await session.execute(count_stmt)).scalar_one()

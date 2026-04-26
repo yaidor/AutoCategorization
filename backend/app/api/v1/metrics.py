@@ -31,6 +31,7 @@ def metrics_filters(
     seller_id: int | None = None,
     industry: Industry | None = None,
     closed: bool | None = None,
+    uncategorized: bool | None = None,
 ) -> MetricsFilters:
     return MetricsFilters(
         from_date=from_date,
@@ -38,6 +39,7 @@ def metrics_filters(
         seller_id=seller_id,
         industry=industry,
         closed=closed,
+        uncategorized=uncategorized,
     )
 
 

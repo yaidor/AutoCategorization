@@ -14,12 +14,14 @@ export function useMetricsFilters() {
   const sellerId = searchParams.get("seller_id");
   const industry = searchParams.get("industry");
   const closed = searchParams.get("closed");
+  const uncategorized = searchParams.get("uncategorized");
 
   if (from) filters.from = from;
   if (to) filters.to = to;
   if (sellerId) filters.seller_id = Number(sellerId);
   if (industry) filters.industry = industry;
   if (closed !== null) filters.closed = closed === "true";
+  if (uncategorized !== null) filters.uncategorized = uncategorized === "true";
 
   function setFilter<K extends FilterKey>(key: K, value: FilterValue<K> | undefined) {
     setSearchParams((prev) => {

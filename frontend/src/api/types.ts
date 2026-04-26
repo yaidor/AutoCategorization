@@ -84,6 +84,7 @@ export interface MetricsFilters {
   seller_id?: number;
   industry?: string;
   closed?: boolean;
+  uncategorized?: boolean;
 }
 
 export interface CategorizationFull {

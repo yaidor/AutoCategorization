@@ -22,6 +22,7 @@ class MetricsFilters:
     seller_id: int | None = None
     industry: Industry | None = None
     closed: bool | None = None
+    uncategorized: bool | None = None
 
 
 def _apply_filters(stmt: Select, filters: MetricsFilters) -> Select:
@@ -35,6 +36,10 @@ def _apply_filters(stmt: Select, filters: MetricsFilters) -> Select:
         stmt = stmt.where(Categorization.industry == filters.industry)
     if filters.closed is not None:
         stmt = stmt.where(Meeting.closed.is_(filters.closed))
+    if filters.uncategorized is True:
+        stmt = stmt.where(Categorization.id.is_(None))
+    elif filters.uncategorized is False:
+        stmt = stmt.where(Categorization.id.is_not(None))
     return stmt
 
 

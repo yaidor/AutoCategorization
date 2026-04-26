@@ -81,10 +81,27 @@ export function GlobalFilters() {
           <select
             id="industry"
             className={SELECT_CLASSES}
-            value={filters.industry ?? ""}
-            onChange={(e) => setFilter("industry", e.target.value || undefined)}
+            value={
+              filters.uncategorized === true
+                ? "__uncategorized__"
+                : (filters.industry ?? "")
+            }
+            onChange={(e) => {
+              const v = e.target.value;
+              if (v === "__uncategorized__") {
+                setFilter("industry", undefined);
+                setFilter("uncategorized", true);
+              } else if (v === "") {
+                setFilter("industry", undefined);
+                setFilter("uncategorized", undefined);
+              } else {
+                setFilter("industry", v);
+                setFilter("uncategorized", undefined);
+              }
+            }}
           >
             <option value="">Todas</option>
+            <option value="__uncategorized__">Sin categorizar</option>
             {Object.entries(INDUSTRY_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
                 {label}

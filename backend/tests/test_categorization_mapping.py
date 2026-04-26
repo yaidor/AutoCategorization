@@ -1,5 +1,6 @@
 from app.services.categorization.mapping import build_categorization
 from app.services.llm.base import LLMResponse
+from app.services.llm.prompt import PROMPT_VERSION
 from app.services.llm.providers.mock import MockProvider
 from app.services.llm.schema import CategorizationResult, EstimatedVolume
 
@@ -36,7 +37,7 @@ def test_mapping_copies_fields_and_sets_provenance() -> None:
     assert cat.meeting_id == 42
     assert cat.provider == "mock"
     assert cat.model == "mock-deterministic-v1"
-    assert cat.prompt_version == "v1"
+    assert cat.prompt_version == PROMPT_VERSION
     assert cat.industry == "saas_tech"
     assert cat.use_case == "customer_support"
     assert cat.volume_amount == 500

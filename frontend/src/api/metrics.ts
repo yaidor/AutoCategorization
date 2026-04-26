@@ -16,6 +16,9 @@ function buildQuery(filters: MetricsFilters): string {
   if (filters.seller_id !== undefined) params.set("seller_id", String(filters.seller_id));
   if (filters.industry) params.set("industry", filters.industry);
   if (filters.closed !== undefined) params.set("closed", String(filters.closed));
+  if (filters.uncategorized !== undefined) {
+    params.set("uncategorized", String(filters.uncategorized));
+  }
   const qs = params.toString();
   return qs ? `?${qs}` : "";
 }
