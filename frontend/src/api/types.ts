@@ -85,3 +85,84 @@ export interface MetricsFilters {
   industry?: string;
   closed?: boolean;
 }
+
+export interface CategorizationFull {
+  id: number;
+  meeting_id: number;
+  provider: string;
+  model: string;
+  prompt_version: string;
+  industry: string;
+  use_case: string;
+  interest_level: number;
+  sentiment: number;
+  urgency: string;
+  volume_amount: number | null;
+  volume_period: string | null;
+  discovery_channel: string;
+  integration_required: boolean;
+  systems_mentioned: string[];
+  main_objection: string | null;
+  competitors_mentioned: string[];
+  personalization_concern: string;
+  data_sensitivity: string;
+  close_probability: number;
+  customer_segment: string;
+  key_topics: string[];
+  summary_es: string;
+  cached: boolean;
+  created_at: string;
+}
+
+export interface CustomerListItem {
+  customer_id: number;
+  customer_name: string;
+  customer_email: string | null;
+  customer_phone: string | null;
+  seller_id: number;
+  seller_name: string;
+  meeting_id: number;
+  meeting_date: string;
+  closed: boolean;
+  industry: string | null;
+  close_probability: number | null;
+  has_categorization: boolean;
+}
+
+export interface CustomerListPage {
+  items: CustomerListItem[];
+  total: number;
+  skip: number;
+  limit: number;
+}
+
+export interface SellerSummary {
+  id: number;
+  name: string;
+}
+
+export interface MeetingDetailResponse {
+  id: number;
+  meeting_date: string;
+  closed: boolean;
+  transcript: string;
+  transcript_hash: string;
+  created_at: string;
+  categorization: CategorizationFull | null;
+}
+
+export interface CustomerDetailResponse {
+  id: number;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  created_at: string;
+  seller: SellerSummary;
+  meetings: MeetingDetailResponse[];
+}
+
+export type CustomerSort =
+  | "meeting_date_desc"
+  | "meeting_date_asc"
+  | "customer_name_asc"
+  | "customer_name_desc";

@@ -1,6 +1,6 @@
 import structlog
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import delete, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models import Categorization, Meeting
@@ -32,6 +32,14 @@ async def categorize_meeting(
         if cached is not None:
             log.info("categorization_cache_hit", meeting_id=meeting_id, model=provider.model)
             return CategorizationResponse.model_validate(cached).model_copy(update={"cached": True})
+    else:
+        await session.execute(
+            delete(Categorization).where(
+                Categorization.meeting_id == meeting_id,
+                Categorization.prompt_version == PROMPT_VERSION,
+                Categorization.model == provider.model,
+            )
+        )
 
     log.info(
         "categorization_calling_llm",

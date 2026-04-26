@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 
+from app.api.v1.customers import router as customers_router
 from app.api.v1.jobs import router as jobs_router
 from app.api.v1.meetings import router as meetings_router
 from app.api.v1.metrics import router as metrics_router
@@ -13,3 +14,4 @@ router.include_router(meetings_router)
 router.include_router(jobs_router)
 router.include_router(metrics_router)
 router.include_router(sellers_router)
+router.include_router(customers_router)
