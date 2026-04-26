@@ -40,5 +40,11 @@ class Settings(BaseSettings):
         "http://localhost:5173"
     ]
 
+    llm_provider: str = "mock"
+    llm_model: str = ""
+    llm_api_key: str = ""
+    llm_timeout_seconds: float = 30.0
+    llm_max_concurrent: int = 5
+
 
 settings = Settings()
