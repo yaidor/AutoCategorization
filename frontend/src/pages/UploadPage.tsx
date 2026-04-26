@@ -1,4 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
+import { SparklesIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,6 +10,13 @@ import { CsvDropzone } from "@/components/upload/CsvDropzone";
 import { IngestSummaryView } from "@/components/upload/IngestSummaryView";
 import { JobProgress } from "@/components/upload/JobProgress";
 import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 export function UploadPage() {
   const [file, setFile] = useState<File | null>(null);
@@ -37,9 +45,13 @@ export function UploadPage() {
     mutationFn: () => api.post<JobResponse>("/api/v1/meetings/batch-categorize"),
     onSuccess: (job) => {
       setActiveJobId(job.id);
-      toast.success(`Categorización iniciada (job #${job.id})`, {
-        description: `${job.total} reuniones por procesar`,
-      });
+      if (job.total === 0) {
+        toast.info("No hay reuniones pendientes de categorizar");
+      } else {
+        toast.success(`Categorización iniciada (job #${job.id})`, {
+          description: `${job.total} reuniones por procesar`,
+        });
+      }
     },
     onError: (err) => {
       toast.error("Error al iniciar categorización", {
@@ -59,6 +71,8 @@ export function UploadPage() {
     setSummary(null);
     setActiveJobId(null);
   }
+
+  const showStandaloneRetry = !file && !summary;
 
   return (
     <div className="space-y-6">
@@ -103,6 +117,32 @@ export function UploadPage() {
             </Button>
           </div>
         </>
+      ) : null}
+
+      {showStandaloneRetry ? (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 font-heading text-lg">
+              <SparklesIcon className="h-4 w-4" />
+              Categorizar reuniones pendientes
+            </CardTitle>
+            <CardDescription>
+              Procesa las reuniones que aún no tienen categorización (típicamente las
+              que fallaron por rate limit del LLM en intentos anteriores). El cache
+              evita reprocesar las que ya están al día.
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <Button
+              onClick={() => categorizeMutation.mutate()}
+              disabled={categorizeMutation.isPending}
+            >
+              {categorizeMutation.isPending
+                ? "Iniciando..."
+                : "Categorizar pendientes"}
+            </Button>
+          </CardContent>
+        </Card>
       ) : null}
 
       {activeJobId !== null ? <JobProgress jobId={activeJobId} /> : null}

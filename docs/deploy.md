@@ -33,8 +33,13 @@ En el servicio `salescat-api`:
 - Branch: `main`
 
 Railway detectará el `Dockerfile` y el `railway.json` que están dentro de `backend/`. El `railway.json` configura:
-- Health check path: `/health`
-- Start command: corre `alembic upgrade head` + seed + uvicorn con proxy headers.
+- **Pre-deploy command**: `alembic upgrade head && python -m app.cli.seed` (corre en un container efímero antes del deploy real, idempotente).
+- **Healthcheck**: path `/health`, timeout 60s.
+- El **start command** NO está en `railway.json` — Railway usa el `CMD` del Dockerfile (`sh -c "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips '*'"`). Ver "Gotchas" más abajo para por qué.
+
+**Settings → Config-as-code → Railway Config File**: dejar vacío o `railway.json` (sin slash, relativo al Root Directory). Si pone `/backend/pyproject.toml` o cualquier otra cosa, el deploy falla.
+
+**Settings → Deploy → Custom Start Command**: **DEJAR VACÍO**. Si pones algo acá, override el CMD del Dockerfile y volvés a tener el problema de `$PORT` literal.
 
 **Settings → Networking**:
 - Click **"Generate Domain"**. Railway crea una URL pública tipo `salescat-api-production.up.railway.app`. Anotala — la vas a necesitar para Vercel.
@@ -178,3 +183,15 @@ Probar el flujo completo:
 
 - Verificar que `SALESCAT_CORS_ORIGINS` incluya el dominio EXACTO de Vercel (con `https://`, sin `/` al final).
 - Si usás preview deploys (`https://salescat-git-feature-x.vercel.app`), agregalos también con coma.
+
+### Healthcheck timeout — "1/1 replicas never became healthy"
+
+Si los logs de deploy muestran que `alembic` arranca pero el container muere antes de que uvicorn levante, o uvicorn loggea `Error: Invalid value for '--port': '$PORT' is not a valid integer`, son alguno de estos casos:
+
+1. **`Custom Start Command` en la UI tiene algo seteado** → override el CMD del Dockerfile. Borralo (dejalo vacío) en Settings → Deploy.
+2. **`startCommand` en `railway.json`** → override igual que el de la UI. Para servicios Dockerfile, Railway corre el `startCommand` en *exec form* (sin shell), entonces `$PORT` queda literal y uvicorn truena. Solución: NO setear `startCommand` en `railway.json` para Dockerfile builds — dejá que el `CMD` del Dockerfile (que tiene `["sh", "-c", ...]`) maneje la expansión.
+3. **`alembic` y `seed` en el `startCommand`** chained con `&&` → si alguno cuelga (especialmente `engine.dispose()` de asyncpg), uvicorn nunca arranca y el healthcheck timeout. Solución: moverlos a `preDeployCommand` (corre en container efímero, separado del start del servicio).
+
+### Config-as-code apunta al archivo equivocado
+
+Si Railway loggea `config file railway.json does not exist` pero el archivo SÍ está en el repo: revisá Settings → Config-as-code → Railway Config File. Debe ser **vacío** (auto-detect) o `railway.json` (relativo al Root Directory). NO `/backend/railway.json`, NO `/backend/pyproject.toml`. Si el path está roto, Railway falls back a Railpack y se rompe el build del Dockerfile.
