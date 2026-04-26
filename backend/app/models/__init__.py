@@ -1,6 +1,7 @@
 from app.models.categorization import Categorization
 from app.models.customer import Customer
+from app.models.job import Job, JobStatus
 from app.models.meeting import Meeting
 from app.models.seller import Seller
 
-__all__ = ["Categorization", "Customer", "Meeting", "Seller"]
+__all__ = ["Categorization", "Customer", "Job", "JobStatus", "Meeting", "Seller"]

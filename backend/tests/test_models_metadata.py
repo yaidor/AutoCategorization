@@ -1,10 +1,10 @@
 from app.db.base import Base
-from app.models import Categorization, Customer, Meeting, Seller
+from app.models import Categorization, Customer, Job, Meeting, Seller
 
 
 def test_all_tables_registered() -> None:
     table_names = set(Base.metadata.tables.keys())
-    assert table_names == {"sellers", "customers", "meetings", "categorizations"}
+    assert table_names == {"sellers", "customers", "meetings", "categorizations", "jobs"}
 
 
 def test_models_have_expected_tablenames() -> None:
@@ -12,6 +12,7 @@ def test_models_have_expected_tablenames() -> None:
     assert Customer.__tablename__ == "customers"
     assert Meeting.__tablename__ == "meetings"
     assert Categorization.__tablename__ == "categorizations"
+    assert Job.__tablename__ == "jobs"
 
 
 def test_meeting_indexes_are_present() -> None:
