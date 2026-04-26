@@ -6,6 +6,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.health import router as health_router
+from app.api.v1 import router as v1_router
 from app.core.config import VERSION, settings
 from app.core.logging import configure_logging
 from app.core.middleware import RequestIDMiddleware
@@ -39,6 +40,7 @@ def create_app() -> FastAPI:
     app.add_middleware(RequestIDMiddleware)
 
     app.include_router(health_router)
+    app.include_router(v1_router)
 
     @app.get("/")
     async def root() -> dict[str, str]:

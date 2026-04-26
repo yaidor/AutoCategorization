@@ -1,0 +1,6 @@
+Nombre,Correo Electronico,Numero de Telefono,Fecha de la Reunion,Vendedor asignado,closed,Transcripcion
+Cliente Uno,uno@example.com,56911111111,2024-01-15,Toro,1,Transcripcion de prueba uno.
+Cliente Dos,dos@example.com,56922222222,2024-02-20,Puma,0,Transcripcion de prueba dos.
+Cliente Tres,,56933333333,2024-03-25,Zorro,1,Transcripcion de prueba tres sin email.
+Cliente Cuatro,cuatro@example.com,,fecha-mala,Boa,1,Transcripcion con date invalido.
+,sin_nombre@example.com,56955555555,2024-05-01,Tiburon,1,Transcripcion sin nombre cliente.
