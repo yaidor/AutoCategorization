@@ -271,7 +271,7 @@ Decisiones tomadas durante el desarrollo, con su justificación:
 
 ### UI / UX
 
-- **Español neutro/chileno** en todas las strings (sin voseo argentino).
+- **Español neutro** en todas las strings.
 - **Theme toggle claro/oscuro** con transición de 200ms; `next-themes` para persistencia + system detection.
 - **Sidebar responsive**: fija en desktop (≥768px), colapsable con hamburger en mobile.
 - **Confirmación destructiva**: re-categorizar (que borra la categorización anterior) requiere modal de confirmación. Acciones idempotentes (cargar CSV, dispar batch) no.
