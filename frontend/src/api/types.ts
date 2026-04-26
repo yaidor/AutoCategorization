@@ -40,3 +40,48 @@ export interface OverviewResponse {
   top_industry: string | null;
   top_discovery_channel: string | null;
 }
+
+export interface SellerMetric {
+  seller_id: number;
+  seller_name: string;
+  total_meetings: number;
+  closed_meetings: number;
+  close_rate: number;
+  avg_sentiment: number;
+  avg_interest_level: number;
+  avg_close_probability: number;
+}
+
+export interface IndustryMetric {
+  industry: string;
+  total_meetings: number;
+  closed_meetings: number;
+  close_rate: number;
+  avg_close_probability: number;
+}
+
+export interface ObjectionMetric {
+  objection: string;
+  count: number;
+  frequency_pct: number;
+}
+
+export interface DiscoveryChannelMetric {
+  discovery_channel: string;
+  total_meetings: number;
+  closed_meetings: number;
+  close_rate: number;
+}
+
+export interface SellerOption {
+  id: number;
+  name: string;
+}
+
+export interface MetricsFilters {
+  from?: string;
+  to?: string;
+  seller_id?: number;
+  industry?: string;
+  closed?: boolean;
+}

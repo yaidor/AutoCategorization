@@ -11,9 +11,15 @@ import {
 } from "lucide-react";
 import { type ReactNode } from "react";
 
-import { ApiError, api } from "@/api/client";
+import { ApiError } from "@/api/client";
+import { fetchOverview } from "@/api/metrics";
 import type { OverviewResponse } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
+import { DiscoveryChannelPie } from "@/components/charts/DiscoveryChannelPie";
+import { IndustryBar } from "@/components/charts/IndustryBar";
+import { ObjectionsList } from "@/components/charts/ObjectionsList";
+import { SellerCloseRateBar } from "@/components/charts/SellerCloseRateBar";
+import { GlobalFilters } from "@/components/filters/GlobalFilters";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import {
@@ -23,13 +29,16 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { useMetricsFilters } from "@/hooks/useMetricsFilters";
 import { formatNumber, formatPercent } from "@/lib/format";
+import { humanizeChannel, humanizeIndustry } from "@/lib/labels";
 
 export function DashboardPage() {
   const { clearApiKey } = useAuth();
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["metrics", "overview"],
-    queryFn: () => api.get<OverviewResponse>("/api/v1/metrics/overview"),
+  const { filters } = useMetricsFilters();
+  const overview = useQuery({
+    queryKey: ["metrics", "overview", filters],
+    queryFn: () => fetchOverview(filters),
   });
 
   return (
@@ -39,11 +48,20 @@ export function DashboardPage() {
         <p className="text-muted-foreground">Vista general de las reuniones de ventas.</p>
       </header>
 
-      {isLoading ? <SkeletonGrid /> : null}
+      <GlobalFilters />
 
-      {error ? <DashboardError error={error} onLogout={clearApiKey} /> : null}
+      {overview.isLoading ? <SkeletonGrid /> : null}
+      {overview.error ? (
+        <DashboardError error={overview.error} onLogout={clearApiKey} />
+      ) : null}
+      {overview.data ? <KPIGrid data={overview.data} /> : null}
 
-      {data ? <KPIGrid data={data} /> : null}
+      <div className="grid gap-4 lg:grid-cols-2">
+        <SellerCloseRateBar filters={filters} />
+        <IndustryBar filters={filters} />
+        <DiscoveryChannelPie filters={filters} />
+        <ObjectionsList filters={filters} />
+      </div>
     </div>
   );
 }
@@ -81,13 +99,13 @@ function KPIGrid({ data }: { data: OverviewResponse }) {
       />
       <KPICard
         title="Industria principal"
-        value={data.top_industry ?? "—"}
+        value={humanizeIndustry(data.top_industry)}
         description="con más reuniones"
         icon={SparklesIcon}
       />
       <KPICard
         title="Canal principal"
-        value={data.top_discovery_channel ?? "—"}
+        value={humanizeChannel(data.top_discovery_channel)}
         description="cómo nos descubrieron"
         icon={RouteIcon}
       />
