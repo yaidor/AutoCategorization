@@ -25,19 +25,29 @@ interface RequestOptions extends Omit<RequestInit, "body"> {
 async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { apiKey, body, headers: extraHeaders, ...init } = options;
   const effectiveKey = apiKey === undefined ? readStoredKey() : apiKey;
+  const isFormData = typeof FormData !== "undefined" && body instanceof FormData;
 
   const headers = new Headers(extraHeaders);
-  if (body !== undefined && !headers.has("Content-Type")) {
+  if (body !== undefined && !isFormData && !headers.has("Content-Type")) {
     headers.set("Content-Type", "application/json");
   }
   if (effectiveKey) {
     headers.set("X-API-Key", effectiveKey);
   }
 
+  let serializedBody: BodyInit | undefined;
+  if (body === undefined) {
+    serializedBody = undefined;
+  } else if (isFormData) {
+    serializedBody = body as FormData;
+  } else {
+    serializedBody = JSON.stringify(body);
+  }
+
   const response = await fetch(`${API_BASE}${path}`, {
     ...init,
     headers,
-    body: body !== undefined ? JSON.stringify(body) : undefined,
+    body: serializedBody,
   });
 
   if (!response.ok) {

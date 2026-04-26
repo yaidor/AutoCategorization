@@ -12,6 +12,7 @@ import {
 import { type ReactNode } from "react";
 
 import { ApiError, api } from "@/api/client";
+import type { OverviewResponse } from "@/api/types";
 import { useAuth } from "@/auth/AuthContext";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -23,16 +24,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { formatNumber, formatPercent } from "@/lib/format";
-
-interface OverviewResponse {
-  total_meetings: number;
-  closed_meetings: number;
-  close_rate: number;
-  avg_sentiment: number | null;
-  avg_close_probability: number | null;
-  top_industry: string | null;
-  top_discovery_channel: string | null;
-}
 
 export function DashboardPage() {
   const { clearApiKey } = useAuth();
