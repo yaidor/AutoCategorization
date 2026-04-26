@@ -16,6 +16,11 @@ from app.core.middleware import RequestIDMiddleware
 async def lifespan(app: FastAPI) -> AsyncIterator[None]:
     log = structlog.get_logger()
     log.info("startup", environment=settings.environment, version=VERSION)
+    if not settings.api_key:
+        log.warning(
+            "api_key_not_set",
+            message="SALESCAT_API_KEY vacía — auth deshabilitada en /api/v1/*",
+        )
     yield
     log.info("shutdown")
 

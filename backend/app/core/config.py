@@ -46,5 +46,7 @@ class Settings(BaseSettings):
     llm_timeout_seconds: float = 30.0
     llm_max_concurrent: int = 5
 
+    api_key: str = ""
+
 
 settings = Settings()
