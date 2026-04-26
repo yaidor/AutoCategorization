@@ -22,6 +22,14 @@ def _parse_csv(value: str | list[str]) -> list[str]:
     return value
 
 
+def _ensure_async_pg_driver(value: str) -> str:
+    if value.startswith("postgresql://"):
+        return value.replace("postgresql://", "postgresql+asyncpg://", 1)
+    if value.startswith("postgres://"):
+        return value.replace("postgres://", "postgresql+asyncpg://", 1)
+    return value
+
+
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -33,7 +41,9 @@ class Settings(BaseSettings):
     environment: str = "development"
     log_level: str = "INFO"
 
-    database_url: str = "postgresql+asyncpg://salescat:salescat@localhost:5432/salescat"
+    database_url: Annotated[str, BeforeValidator(_ensure_async_pg_driver)] = (
+        "postgresql+asyncpg://salescat:salescat@localhost:5432/salescat"
+    )
     redis_url: str = "redis://localhost:6379/0"
 
     cors_origins: Annotated[list[str], NoDecode, BeforeValidator(_parse_csv)] = [
