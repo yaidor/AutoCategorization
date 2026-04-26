@@ -6,8 +6,14 @@ from app.services.llm.prompt import (
 )
 
 
-def test_prompt_version_is_v1() -> None:
-    assert PROMPT_VERSION == "v1"
+def test_prompt_version_is_set() -> None:
+    assert PROMPT_VERSION
+    assert PROMPT_VERSION.startswith("v")
+
+
+def test_system_prompt_includes_calibration_anchors() -> None:
+    for token in ("close_probability", "0.70 por default", "anclas concretas"):
+        assert token.lower() in SYSTEM_PROMPT.lower()
 
 
 def test_user_prompt_includes_transcript() -> None:

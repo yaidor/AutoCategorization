@@ -1,4 +1,4 @@
-PROMPT_VERSION = "v1"
+PROMPT_VERSION = "v2"
 
 
 SCHEMA_SUMMARY = """{
@@ -36,6 +36,21 @@ REGLAS:
 - `close_probability` es un float entre 0.0 y 1.0.
 - `summary_es` debe ser 1 o 2 oraciones en español.
 - Si una dimensión no es deducible de la transcripción, usa el valor neutro razonable (`other`, `unknown`, listas vacías, `null` solo donde el schema lo permite).
+
+CALIBRACIÓN DE close_probability — IMPORTANTE: usa el rango completo 0.0–1.0, NO te ancles en valores redondos como 0.5 o 0.7. Las transcripciones varían mucho y la probabilidad de cierre debe reflejar esa varianza.
+
+Anclas concretas:
+- 0.90–1.00: cliente con presupuesto explícito, urgencia alta, decision-maker presente, sin objeciones, timeline definido.
+- 0.70–0.89: muy interesado, sin objeciones serias, timeline claro pero sin compromiso firme.
+- 0.50–0.69: interesado y comparando alternativas, con dudas razonables sobre precio o implementación.
+- 0.30–0.49: discovery temprano, interés genuino pero sin urgencia ni decisión de compra inmediata.
+- 0.10–0.29: solo curiosidad o investigación, presupuesto ausente, prioridad baja.
+- 0.00–0.09: rechazo explícito, mala fit, o decision-maker dijo que no.
+
+FACTORES que SUBEN la probabilidad: urgencia alta, integration_required claro, volumen alto, sentiment positivo, mención de timeline, sin competidores fuertes, sin objeciones.
+FACTORES que la BAJAN: objeciones de precio, mención de competidores, personalization_concern alto, data_sensitivity alta sin solución, sentiment neutro o negativo, sin urgencia.
+
+REGLA DE DISCIPLINA: si te encuentras eligiendo 0.70 por default, repensá. Es señal de que no discriminaste lo suficiente entre las dimensiones de la transcripción. Distintas transcripciones DEBEN dar valores distintos.
 
 SCHEMA:
 {SCHEMA_SUMMARY}
